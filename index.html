@@ -82,10 +82,8 @@
 					.anythingSlider(); // update the slider
 			});
 			$('button.remove').click(function(){
-				if ($('#slider1').data('AnythingSlider').pages > 1) {
-					$('#slider1 > li:not(.cloned):last').remove();
-					$('#slider1').anythingSlider(); // update the slider
-				}
+				$('#slider1 > li:not(.cloned):last').remove();
+				$('#slider1').anythingSlider(); // update the slider
 			});
 
 		});
@@ -98,7 +96,6 @@
 
 			$('#slider1').anythingSlider({
 				startStopped    : true,  // If autoPlay is on, this can force it to start stopped
-				width           : 800,   // Override the default CSS width
 				theme           : 'metallic',
 				easing          : 'easeInOutBack',
 //				autoPlayLocked  : true,  // If true, user changing slides will not stop the slideshow
@@ -109,8 +106,6 @@
 			});
 
 			$('#slider2').anythingSlider({
-				width               : 600,   // if resizeContent is false, this is the default width if panel size is not defined
-				height              : 350,   // if resizeContent is false, this is the default height if panel size is not defined
 				resizeContents      : false, // If true, solitary images/objects in the panel will expand to fit the viewport
 				startStopped        : true,  // If autoPlay is on, this can force it to start stopped
 				navigationFormatter : function(index, panel){ // Format navigation labels with text
@@ -122,7 +117,7 @@
 	</script>
 </head>
 
-<body>
+<body id="main">
 
 	<div id="page-wrap">
 
@@ -263,81 +258,119 @@
 		<br>
 		<blockquote>
 			<pre>$('#slider').anythingSlider({
-  // Appearance
-  width               : null,      // Override the default CSS width
-  height              : null,      // Override the default CSS height
+  // ** Appearance **
+  theme               : "default", // Theme name
   expand              : false,     // If true, the entire slider will expand to fit the parent element
   resizeContents      : true,      // If true, solitary images/objects in the panel will expand to fit the viewport
   showMultiple        : false,     // Set this value to a number and it will show that many slides at once
-  tooltipClass        : 'tooltip', // Class added to navigation &amp; start/stop button (text copied to title if it is hidden by a negative text indent)
-  theme               : 'default', // Theme name - adds a class name to the base element "anythingSlider-{theme}" so the loaded theme will work.
+  easing              : "swing",   // Anything other than "linear" or "swing" requires the easing plugin or jQuery UI
+
+  buildArrows         : true,      // If true, builds the forwards and backwards buttons
+  buildNavigation     : true,      // If true, builds a list of anchor links to link to each panel
+  buildStartStop      : true,      // ** If true, builds the start/stop button
+
+  appendFowardTo      : null,      // Append forward arrow to a HTML element (jQuery Object, selector or HTMLNode), if not null
+  appendBackTo        : null,      // Append back arrow to a HTML element (jQuery Object, selector or HTMLNode), if not null
+  appendControlsTo    : null,      // Append controls (navigation + start-stop) to a HTML element (jQuery Object, selector or HTMLNode), if not null
+  appendNavigationTo  : null,      // Append navigation buttons to a HTML element (jQuery Object, selector or HTMLNode), if not null
+  appendStartStopTo   : null,      // Append start-stop button to a HTML element (jQuery Object, selector or HTMLNode), if not null
+
+  toggleArrows        : false,     // If true, side navigation arrows will slide out on hovering & hide @ other times
+  toggleControls      : false,     // if true, slide in controls (navigation + play/stop button) on hover and slide change, hide @ other times
+
+  startText           : "Start",   // Start button text
+  stopText            : "Stop",    // Stop button text
+  forwardText         : "&amp;raquo;", // Link text used to move the slider forward (hidden by CSS, replaced with arrow image)
+  backText            : "&amp;laquo;", // Link text used to move the slider back (hidden by CSS, replace with arrow image)
+  tooltipClass        : "tooltip", // Class added to navigation & start/stop button (text copied to title if it is hidden by a negative text indent)
+
+  // Function
+  enableArrows        : true,      // if false, arrows will be visible, but not clickable.
+  enableNavigation    : true,      // if false, navigation links will still be visible, but not clickable.
+  enableStartStop     : true,      // if false, the play/stop button will still be visible, but not clickable. Previously "enablePlay"
+  enableKeyboard      : true,      // if false, keyboard arrow keys will not work for this slider.
 
   // Navigation
   startPanel          : 1,         // This sets the initial panel
   changeBy            : 1,         // Amount to go forward or back when changing panels.
   hashTags            : true,      // Should links change the hashtag in the URL?
-  infiniteSlides      : true,      // if false, the slider will not wrap
-  enableKeyboard      : true,      // if false, keyboard arrow keys will not work for the current panel.
-  buildArrows         : true,      // If true, builds the forwards and backwards buttons
-  toggleArrows        : false,     // if true, side navigation arrows will slide out on hovering &amp; hide @ other times
-  buildNavigation     : true,      // If true, builds a list of anchor links to link to each panel
-  enableNavigation    : true,      // if false, navigation links will still be visible, but not clickable.
-  toggleControls      : false,     // if true, slide in controls (navigation + play/stop button) on hover and slide change, hide @ other times
-  appendControlsTo    : null,      // A HTML element (jQuery Object, selector or HTMLNode) to which the controls will be appended if not null
+  infiniteSlides      : true,      // if false, the slider will not wrap & not clone any panels
   navigationFormatter : null,      // Details at the top of the file on this use (advanced use)
-  forwardText         : "&amp;raquo;", // Link text used to move the slider forward (hidden by CSS, replaced with arrow image)
-  backText            : "&amp;laquo;", // Link text used to move the slider back (hidden by CSS, replace with arrow image)
 
   // Slideshow options
-  enablePlay          : true,      // if false, the play/stop button will still be visible, but not clickable.
-  autoPlay            : true,      // This turns off the entire slideshow FUNCTIONALY, not just if it starts running or not
+  autoPlay            : false,     // If true, the slideshow will start running; replaces "startStopped" option
   autoPlayLocked      : false,     // If true, user changing slides will not stop the slideshow
-  startStopped        : false,     // If autoPlay is on, this can force it to start stopped
-  pauseOnHover        : true,      // If true &amp; the slideshow is active, the slideshow will pause on hover
-  stopAtEnd           : false,     // If true &amp; the slideshow is active, the slideshow will stop on the last page. This also stops the rewind effect when infiniteSlides is false.
+  autoPlayDelayed     : false,     // If true, starting a slideshow will delay advancing slides; if false, the slider will immediately advance to the next slide when slideshow starts
+  pauseOnHover        : true,      // If true & the slideshow is active, the slideshow will pause on hover
+  stopAtEnd           : false,     // If true & the slideshow is active, the slideshow will stop on the last page. This also stops the rewind effect when infiniteSlides is false.
   playRtl             : false,     // If true, the slideshow will move right-to-left
-  startText           : "Start",   // Start button text
-  stopText            : "Stop",    // Stop button text
+
+  // Times
   delay               : 3000,      // How long between slideshow transitions in AutoPlay mode (in milliseconds)
   resumeDelay         : 15000,     // Resume slideshow after user interaction, only if autoplayLocked is true (in milliseconds).
   animationTime       : 600,       // How long the slideshow transition takes (in milliseconds)
-  easing              : "swing",   // Anything other than "linear" or "swing" requires the easing plugin
 
   // Callbacks
-  onBeforeInitialize  : null,      // Callback before the plugin initializes
-  onInitialized       : null,      // Callback when the plugin finished initializing
-  onShowStart         : null,      // Callback on slideshow start
-  onShowStop          : null,      // Callback after slideshow stops
-  onShowPause         : null,      // Callback when slideshow pauses
-  onShowUnpause       : null,      // Callback when slideshow unpauses - may not trigger properly if user clicks on any controls
-  onSlideInit         : null,      // Callback when slide initiates, before control animation
-  onSlideBegin        : null,      // Callback before slide animates
-  onSlideComplete     : null,      // Callback when slide completes
+  onBeforeInitialize  : function(e, slider) {}, // Callback before the plugin initializes
+  onInitialized       : function(e, slider) {}, // Callback when the plugin finished initializing
+  onShowStart         : function(e, slider) {}, // Callback on slideshow start
+  onShowStop          : function(e, slider) {}, // Callback after slideshow stops
+  onShowPause         : function(e, slider) {}, // Callback when slideshow pauses
+  onShowUnpause       : function(e, slider) {}, // Callback when slideshow unpauses - may not trigger properly if user clicks on any controls
+  onSlideInit         : function(e, slider) {}, // Callback when slide initiates, before control animation
+  onSlideBegin        : function(e, slider) {}, // Callback before slide animates
+  onSlideComplete     : function(slider) {},    // Callback when slide completes; this is the only callback without an event "e" variable
 
   // Interactivity
-  clickArrows         : "click",         // Event used to activate arrow functionality (e.g. "click" or "mouseenter")
+  clickForwardArrow   : "click",         // Event used to activate forward arrow functionality (e.g. add jQuery mobile's "swiperight")
+  clickBackArrow      : "click",         // Event used to activate back arrow functionality (e.g. add jQuery mobile's "swipeleft")
   clickControls       : "click focusin", // Events used to activate navigation control functionality
   clickSlideshow      : "click",         // Event used to activate slideshow play/stop button
 
   // Video
   resumeOnVideoEnd    : true,      // If true & the slideshow is active & a supported video is playing, it will pause the autoplay until the video is complete
   addWmodeToObject    : "opaque",  // If your slider has an embedded object, the script will automatically add a wmode parameter with this setting
-  isVideoPlaying      : function(base){ return false; }, // return true if video is playing or false if not - used by video extension
-
-  // Misc options
-  maxOverallWidth     : 32766     // Max width (in pixels) of combined sliders (side-to-side); set to 32766 to prevent problems with Opera
+  isVideoPlaying      : function(base){ return false; } // return true if video is playing or false if not - used by video extension
 });</pre>
 		</blockquote>
 
 		<h2>Known Issues</h2>
 		<ul>
-			<li>None that we know of!</li>
+			<li>Please refer to the <a href="https://github.com/ProLoser/AnythingSlider/wiki">documentation</a>.</li>
 		</ul>
 
 		<h2>Changelog</h2>
 
 		Only the latest versions will be shown here. See the <a href="https://github.com/ProLoser/AnythingSlider/wiki/Change-Log">full change log here</a>.<br>
 		<br>
+
+		<h3>Version 1.7</h3>
+		<ul>
+			<li>Removed <code>width</code> and <code>height</code> options. These are now set in the css. Enhancement suggested in <a href="https://github.com/ProLoser/AnythingSlider/issues/125">issue #125</a>.</li>
+			<li>Removed <code>maxOverallWidth</code> option.
+				<ul><br>
+					<li>This option was in place to ensure that the slider did not exceed Opera's 32766 pixel maximum width restriction.</li>
+					<li>Added <code>.anythingBase { max-width: 32766px; }</code> to the css.</li>
+				</ul>
+			</li>
+			<li>Removed <code>clickArrows</code> and replaced it with <code>clickForwardArrow</code> &amp; <code>clickBackArrow</code> to allow for jQuery Mobile users to add "swipeLeft" &amp; "swipeRight".</li>
+			<li>Changed <code>autoPlay</code>:
+				<ul><br>
+					<li>Split <code>autoPlay</code> functionality, so that setting the new <code>buildStartStop</code> option to <code>true</code> will now build the start stop button.</li>
+					<li>Now, when <code>autoPlay</code> is <code>true</code>, the slideshow will now start automatically. Default set to <code>false</code>.</li>
+				</ul>
+			</li>
+			<li>Added <code>appendFowardTo</code> &amp; <code>appendBackTo</code> to indicate where to append the forward &amp; back arrows. Enhancement suggested by <a href="https://github.com/ProLoser/AnythingSlider/issues/129">issue #129</a>.</li>
+			<li>Added <code>appendNavigationTo</code> &amp; <code>appendStartStopTo</code> to indicate where to append the navigation tabs &amp; start-stop button.</li>
+			<li>Added <code>enableArrows</code> option. When false, the arrows are visible, but not clickable.</li>
+			<li>Added <code>enableStartStop</code> option. When false, the start-stop button is visible, but not clickable.</li>
+			<li>Added <code>autoPlayDelayed</code> option. When <code>true</code> clicking to start the slide show will not immediately advance the slider. Enhancement suggested in <a href="https://github.com/ProLoser/AnythingSlider/issues/125">issue #125</a>.</li>
+			<li>Fixed <code>autoPlayLocked</code> true from starting the slideshow if the slideshow button is off (<code>buildStartStop</code>). Fix for <a href="https://github.com/ProLoser/AnythingSlider/issues/126">issue #126</a>.</li>
+			<li>Fixed Fx extension not completing the FX out animation when <code>animationTime</code> option is a very small number. Fix for <a href="https://github.com/ProLoser/AnythingSlider/issues/130">issue #130</a></li>
+			<li>Fixed running slideshow from making the slider active. It will still active when the user interacts with the slider.</li>
+			<li>Fixed video source tags - removed unnecessary closing slash.</li>
+			<li>Fixed a bug where multiple "activePage" classes were applied.</li>
+		</ul>
 
 		<h3>Version 1.6.2</h3>
 		<ul>
@@ -364,96 +397,6 @@
 			</li>
 			<li>Fixed the problem in IE7 where the an embeded video would not resize properly.</li>
 			<li>Fixed a problem with the plugin causing an error if the panel is empty or only contains a text node.</li>
-		</ul>
-
-		<h3>Version 1.5.21</h3>
-		<ul>
-			<li>Fixed <code>$currentPage</code> returning the incorrect page during the <code>onSlideInit</code> and <code>onSlideBegin</code> events.</li>
-			<li>Added <code>$targetPage</code> which provides the (non-cloned) destination page of the slider.</li>
-		</ul>
-
-		<h3>Version 1.5.20</h3>
-		<ul>
-			<li>Disabled focused links inside of a slider showing multiple slides, so now clicking on a link won't move the slider.</li>
-		</ul>
-
-		<h3>Version 1.5.19</h3>
-		<ul>
-			<li>Removed the <code>themeDirectory</code> option.
-				<ul>
-					<li>It is preferred that you add the theme stylesheet manually as described on the <a href="https://github.com/ProLoser/AnythingSlider/wiki/Setup">setup page</a>.</li>
-					<li>This prevents the plugin from appending the stylesheet to the head of the document and overriding the IE stylesheet.</li>
-				</ul>
-			</li>
-			<li>Changed the plugin so that an unordered list is no longer mandatory. The plugin will now look for the immediate children of the slider element. So this is now possible:
-				<blockquote>
-					<pre>&lt;div id="slider"&gt;
-  &lt;div&gt;&lt;!-- slide content --&gt;&lt;/div&gt;
-  &lt;div&gt;&lt;!-- slide content --&gt;&lt;/div&gt;
-  &lt;div&gt;&lt;!-- slide content --&gt;&lt;/div&gt;
-&lt;/div&gt;</pre>
-				</blockquote>
-				The method to initialize and control the slider hasn't changed.
-			</li>
-		</ul>
-
-		<h3>Version 1.5.18</h3>
-		<ul>
-			<li>Fixed a problem with a javascript error occurring when only one slide is present and the width is set.</li>
-			<li>Added an internal variable "o" to replace "base.options" to reduce the code size by about 1k in both the regular and minified versions.</li>
-		</ul>
-
-		<h3>Version 1.5.17</h3>
-		<ul>
-			<li>Added an "Expand Demo" page because apparently the jsFiddle doesn't like to expand.</li>
-			<li>Modified a couple of selectors that are only available in jQuery 1.4+. So as before, if you need the plugin compatible with jQuery 1.3.2, all you need to do is un-comment out the code at the bottom of the "jquery.anythingslider.js" file.</li>
-		</ul>
-
-		<h3>Version 1.5.16</h3>
-		<ul>
-			<li>Added the <code>expand</code> option:
-				<ul>
-					<li>When true, the slider will expand to fit into the parent element.</li>
-					<li>This option allows you to apply a percentage width to the parent element for a fluid layout and have the slider resize automatically.</li>
-					<li>One example would be to have a div set to say "100%" browser width. The slider will expand to fit inside this div (width and height).</li>
-					<li>Please do not have the parent element of the slider be the body of the page. It won't break anything, but the height is difficult to determine since the body height measured doesn't include other elements on the page</li>
-					<li>There is a slight delay while resizing (500 millisecond) as the plugin resizes and repositions the panels. You'll just have to live with it :(</li>
-					<li>There is one bug in *Opera* where the height isn't set until the parent element is resized... I'll try to find it.</li>
-				</ul>
-			</li>
-			<li>Also fixed the <code>showMultiple</code> code so that a width is no longer required if and only if all the panels are the same width. It simply divides the slider width by the number of slides to show... so you see why this may not work so well with different width panels.</li>
-		</ul>
-
-		<h3>Version 1.5.15</h3>
-		<ul>
-			<li>Fixed a problem in the code where <code>startPage</code> was used instead of <code>startPanel</code> - DUH.</li>
-			<li>Oh, and also made sure the script was getting a number instead of a string in the start panel option.</li>
-		</ul>
-
-		<h3>Version 1.5.14</h3>
-		<ul>
-			<li>Added <code>showMultiple</code> option - A enhancement proposed in <a href="https://github.com/ProLoser/AnythingSlider/issues/72">issue #72</a>.
-				<ul>
-					<li>When set to a number, AnythingSlider will show that number of slides within the view port.</li>
-					<li>When showing multiple slides, width of the slider MUST be included - well actually it is the width of one slide, so the plugin can figure out how big to make the view port.</li>
-					<li>The maximum number of slides showing is set to the number of slides.</li>
-					<li>If slides have different dimensions and <code>resizeContents</code> is set to <code>false</code>, the slider will resize to the height of the taller slide.</li>
-					<li>Updated the playground with this option. Check it this <a href="http://jsfiddle.net/Mottie/S8Je5/1/">demo</a> with two slides showing!</li>
-					<li>Thanks to <a href="https://github.com/caseybecking">caseybecking</a> for the idea. And a ton more thanks to <a href="https://github.com/poebel">Poebel</a> for sharing the code to do this.</li>
-				</ul>
-			</li>
-		</ul>
-
-		<h3>Version 1.5.13</h3>
-		<ul>
-			<li>Fixed a bug where an empty UL would cause javascript errors - fix for <a href="https://github.com/ProLoser/AnythingSlider/issues/91">issue #91</a>.</li>
-			<li>Changed the panel positioning from using `scrollLeft` to `left`. This small change fixed a couple of problems including:
-				<ul>
-					<li>Print preview now shows the current panel without any additional css changes. The navigation arrows and tabs will need additonal print css styling.</li>
-					<li>Easing that required a negative margin using scrollLeft no longer needs any special handling - see <a href="https://github.com/ProLoser/AnythingSlider/issues/61">issue #61</a>.</li>
-					<li>A hidden AnythingSlider will now position properly. When attempting to set the panel with the slider hidden, scrollLeft would always return zero and not set properly. Updated Wiki FAQ with this information as well.</li>
-				</ul>
-			</li>
 		</ul>
 
 	</div>

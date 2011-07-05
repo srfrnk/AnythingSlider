@@ -8,8 +8,6 @@ $(document).ready(function(){
 
 	$('#slider1')
 	.anythingSlider({
-		width          : 400,
-		height         : 300,
 		startStopped   : true,
 		toggleControls : true,
 		theme          : 'metallic',
@@ -30,8 +28,6 @@ $(document).ready(function(){
 
 	$('#slider2')
 	.anythingSlider({
-		width               : 600,
-		height              : 350,
 		startStopped        : true,
 		resizeContents      : false,
 		navigationFormatter : function(i, panel){
@@ -41,7 +37,7 @@ $(document).ready(function(){
 	.anythingSliderFx({
 		// base FX definitions
 		// '.selector' : [ 'effect(s)', 'distance/size', 'time', 'easing' ] - 'time' and 'easing' are optional parameters
-		'.quoteSlide'         : [ 'top', '500px', '1000', 'easeOutElastic' ],
+		'.quoteSlide'         : [ 'top', '500px', '400', 'easeOutElastic' ],
 		'.expand'             : [ 'expand', '10%', '400', 'easeOutBounce' ],
 		'.textSlide h3'       : [ 'top left', '200px', '500', 'easeOutCirc' ],
 		'.textSlide img,.fade': [ 'fade' ],
@@ -71,8 +67,6 @@ $(document).ready(function(){
 
 	$('#slider3')
 	.anythingSlider({
-		width               : 500,
-		height              : 400,
 		startStopped        : true,
 		navigationFormatter : function(i, panel){
 			return ['Top', 'Right', 'Bottom', 'Left'][i - 1];
