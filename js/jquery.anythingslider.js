@@ -1,5 +1,5 @@
 /*
-	AnythingSlider v1.7.24
+	AnythingSlider v1.7.25
 	Original by Chris Coyier: http://css-tricks.com
 	Get the latest version: https://github.com/ProLoser/AnythingSlider
 
@@ -84,8 +84,6 @@
 
 			base.updateSlider();
 
-			base.$lastPage = base.$currentPage;
-
 			// Get index (run time) of this slider on the page
 			base.runTimes = $('div.anythingSlider').index(base.$wrapper) + 1;
 			base.regex = new RegExp('panel' + base.runTimes + '-(\\d+)', 'i'); // hash tag regex
@@ -111,6 +109,8 @@
 
 			// If a hash can not be used to trigger the plugin, then go to start panel
 			base.setCurrentPage(base.gotoHash() || o.startPage, false);
+
+			base.$lastPage = base.$targetPage = base.$currentPage;
 
 			// Hide/Show navigation & play/stop controls
 			base.slideControls(false);
@@ -171,6 +171,7 @@
 
 		// called during initialization & to update the slider if a panel is added or deleted
 		base.updateSlider = function(){
+			var t;
 			// needed for updating the slider
 			base.$el.children('.cloned').remove();
 			base.$nav.empty();
@@ -229,7 +230,13 @@
 					.css('width', base.getDim(base.currentPage)[0])
 					.add(base.$items).css('height', base.height);
 			} else {
-				base.$win.load(function(){ base.setDimensions(); }); // set dimensions after all images load
+				base.$win.load(function(){
+					// set dimensions after all images load
+					base.setDimensions();
+					// make sure the outer wrapper is set properly
+					t = base.getDim(base.currentPage);
+					base.$wrapper.css({ width: t[0], height: t[1] });
+				});
 			}
 
 			if (base.currentPage > base.pages) {
@@ -265,7 +272,6 @@
 							// prevent running functions twice (once for click, second time for focusin)
 							base.flag = true; setTimeout(function(){ base.flag = false; }, 100);
 							base.gotoPage(index);
-							if (o.hashTags) { base.setHash(index); }
 						}
 						e.preventDefault();
 					})
@@ -284,7 +290,7 @@
 					base.navWidths = base.$nav.find('li').map(function(){
 						return $(this).innerWidth() + Math.ceil(parseInt($(this).find('span').css('left'),10)/2 || 0);
 					}).get();
-					base.navLeft = 1;
+					base.navLeft = base.currentPage;
 					// add 5 pixels to make sure the tabs don't wrap to the next line
 					base.$nav.width( base.navWidth( 1, base.pages + 1 ) + 5 );
 					base.$controls.find('.anythingNavWindow')
@@ -499,7 +505,7 @@
 			base.currentPage = ( page > base.pages ) ? base.pages : ( page < 1 ) ? 1 : base.currentPage;
 			base.$currentPage = base.$items.eq(base.currentPage - base.adj);
 			base.targetPage = (page === 0) ? base.pages : (page > base.pages) ? 1 : page;
-			base.$targetPage = base.$items.eq( base.targetPage - 1 );
+			base.$targetPage = base.$items.eq( base.targetPage - base.adj);
 			time = time || o.animationTime;
 			// don't trigger events when time < 0 - to prevent FX from firing multiple times on page resize
 			if (time >= 0) { base.$el.trigger('slide_init', base); }
@@ -515,15 +521,18 @@
 
 			// delay starting slide animation
 			setTimeout(function(d){
+				var p, empty = true;
 				// resize slider if content size varies
 				if (!o.resizeContents) {
 					// animating the wrapper resize before the window prevents flickering in Firefox
-					d = base.getDim(page);
-					base.$wrapper.filter(':not(:animated)').animate(
-						// prevent animating a dimension to zero
-						{ width: d[0] || base.width, height: d[1] || base.height },
-						{ queue: false, duration: (time < 0 ? 0 : time), easing: o.easing }
-					);
+					// don't animate the dimension if it hasn't changed - fix for issue #264
+					p = base.getDim(page); d = {};
+					// prevent animating a dimension to zero
+					if (base.$wrapper.width() !== p[0]) { d.width = p[0] || base.width; empty = false; }
+					if (base.$wrapper.height() !== p[1]) { d.height = p[1] || base.height; empty = false; }
+					if (!empty) {
+						base.$wrapper.filter(':not(:animated)').animate(d, { queue: false, duration: (time < 0 ? 0 : time), easing: o.easing });
+					}
 				}
 				d = {};
 				d[base.dir] = -base.panelSize[(o.infiniteSlides && base.pages > 1) ? page : page - 1][2];
@@ -549,6 +558,8 @@
 			base.$items.removeClass('activePage').eq(page - base.adj).addClass('activePage');
 
 			if (!base.hovered) { base.slideControls(false); }
+
+			if (o.hashTags) { base.setHash(page); }
 
 			if (time >= 0) { base.$el.trigger('slide_complete', base); }
 			// callback from external slide control: $('#slider').anythingSlider(4, function(slider){ })
