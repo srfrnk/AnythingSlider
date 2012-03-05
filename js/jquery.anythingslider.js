@@ -63,7 +63,7 @@
 			base.adj = (o.infiniteSlides) ? 0 : 1; // adjust page limits for infinite or limited modes
 			base.width = base.$el.width();
 			base.height = base.$el.height();
-			base.outerPad = [ base.$wrapper.innerWidth() - base.$wrapper.width(), base.$wrapper.innerHeight() - base.$wrapper.height() ];
+			base.outerPad = (o.buildArrows) ? [ base.$wrapper.innerWidth() - base.$wrapper.width(), base.$wrapper.innerHeight() - base.$wrapper.height() ] : [0, 0];
 			if (o.playRtl) { base.$wrapper.addClass('rtl'); }
 
 			// Expand slider to fit parent
@@ -77,7 +77,10 @@
 			if (o.buildStartStop) { base.buildAutoPlay(); }
 
 			// Build forwards/backwards buttons
-			if (o.buildArrows) { base.buildNextBackButtons(); }
+			if (o.buildArrows) {
+				$("div.anythingSlider").css({padding: "0 45px 28px 45px"});
+				base.buildNextBackButtons(); 
+			}
 
 			// can't lock autoplay it if it's not enabled
 			if (!o.autoPlay) { o.autoPlayLocked = false; }
